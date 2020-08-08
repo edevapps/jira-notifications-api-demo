@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        $webResourceManager.requireResourcesForContext("jira-notifications-api-demo")
+        <title>Notifications API Demo</title>
+        <meta name="decorator" content="atl.admin"/>
+        <meta name="admin.active.section" content="admin_plugins_menu/jira_notifications_admin_section"/>
+        <meta name="admin.active.tab" content="jira-notifications-api-demo-web-item"/>
+    </head>
+    <body>
+      <div class="aui-group aui-group-split">
+        <div class="aui-item">
+          <h2>
+            <span class="content-header" >$i18n.getText("api-demo-web-item.label")</span>
+          </h2>
+        </div>
+        <div class="aui-item">
+          <a class="aui-button"
+            href="$requestContext.baseUrl/secure/apiDemoWebworkAction!default.jspa">
+              $i18n.getText("refresh-button.label")
+          </a>
+        </div>
+      </div>
+      <div id="error" class="aui-message aui-message-error" #if (!$error) hidden="true" #end >
+        <p class="title">
+          <strong>$error</strong>
+        </p>
+      </div>
+      <div id="message" class="aui-message aui-message-info" #if (!$message) hidden="true" #end >
+        <p class="title">
+          <strong>$message</strong>
+        </p>
+      </div>
+      <div id="api-demo-container">
+        <form id="api-demo-form" class="aui" method="POST" action="$requestContext.baseUrl/secure/apiDemoWebworkAction.jspa">
+          <h4 class="content-header" >$i18n.getText("notification-sending.header")</h4>
+          <div class="field-group">
+            <label for="notification-groups">$i18n.getText("notification-groups.label")</label>
+            <select id="notification-groups" name="notificationGroups" class="select" multiple>
+              #foreach ($selectItem in $notificationGroups)
+                <option value = "$selectItem.value" #if($selectItem.selected == true) selected  #end >$selectItem.name</option>
+              #end
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="notificationName">$i18n.getText("notification-name.label")</label>
+            <input id="notificationName" name="notificationName" class="text" type="text"
+              value="$!notificationName"/>
+          </div>
+          <div class="field-group">
+            <label for="notificationMessage">$i18n.getText("notification-message.label")</label>
+            <textarea id="notificationMessage" name="notificationMessage" class="textarea" rows="6" cols="10"
+              placeholder="$i18n.getText("notification-message.description")">$!notificationMessage</textarea>
+          </div>
+          <div class="buttons-container">
+            <div class="buttons">
+              <button id="notification-send-button" class="aui-button aui-button-primary">
+                $i18n.getText("send-button.label")
+              </button>
+            </div>
+          </div>
+          <input type="hidden" id="notification-groups-value" name="notificationGroupsValue" >
+        </form>
+      </div>
+
+      <script type="text/javascript">
+        #include("/js/jira-notifications-api-demo.js")
+      </script>
+    </body>
+</html>

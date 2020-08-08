@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<atlassian-plugin key="com.edevapps.jira.applications.jira-notifications-api-demo" name="Smart notifications API Demo" plugins-version="2">
+  <plugin-info>
+    <description>Smart notifications API demo application.</description>
+    <version>1.0.0</version>
+    <vendor name="eDevApps" url="http://edevapps.com/"/>
+    <param name="plugin-icon">images/pluginIcon.png</param>
+    <param name="plugin-logo">images/pluginLogo.png</param>
+  </plugin-info>
+
+  <resource type="i18n" name="i18n" location="jira-notifications-api-demo"/>
+
+  <web-resource key="jira-notifications-api-demo-resource" i18n-name-key="i18n" name="Web resources">
+    <description>Web resources module</description><resource type="download" name="jira-notifications-api-demo.css" location="/css/jira-notifications-api-demo.css"/><transformation extension="js">
+    <transformer key="jsI18n"/></transformation><context>jira-notifications-api-demo</context>
+    <context>jira.admin</context><dependency>com.atlassian.auiplugin:ajs</dependency>
+    <dependency>com.atlassian.auiplugin:aui-toggle</dependency>
+    <dependency>com.atlassian.auiplugin:dialog2</dependency>
+    <dependency>com.atlassian.auiplugin:message</dependency>
+    <dependency>com.atlassian.auiplugin:aui-date-picker</dependency>
+    <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+    <dependency>com.atlassian.auiplugin:aui-form-validation</dependency>
+    <dependency>com.atlassian.auiplugin:aui-experimental-soy-templates</dependency>
+  </web-resource>
+
+  <web-item name="Api demo item" key="jira-notifications-api-demo-web-item" section="admin_plugins_menu/jira_notifications_admin_section" weight="1000">
+    <description>Notifications API demo web item</description>
+    <label key="api-demo-web-item.label"/>
+    <link linkId="jira-notifications-api-demo-web-item">/secure/apiDemoWebworkAction!default.jspa</link>
+  </web-item>
+
+  <webwork1 name="Api demo webwork" key="jira-notifications-api-demo-webwork-module">
+    <description>Notifications API demo webwork module</description>
+    <actions>
+      <action name="com.edevapps.jira.applications.notifications.api.app.web.webwork.ApiDemoWebworkAction" alias="apiDemoWebworkAction">
+        <view name="input">/templates/jira-notifications-api-demo.vm</view>
+        <view name="success">/templates/jira-notifications-api-demo.vm</view>
+      </action>
+    </actions>
+  </webwork1>
+</atlassian-plugin>

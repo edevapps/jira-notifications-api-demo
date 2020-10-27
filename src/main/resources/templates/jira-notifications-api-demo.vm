@@ -16,7 +16,7 @@
         </div>
         <div class="aui-item">
           <a class="aui-button"
-            href="$requestContext.baseUrl/secure/apiDemoWebworkAction!default.jspa">
+            href="$requestContext.baseUrl/secure/JiraNotificationsApiDemo!default.jspa">
               $i18n.getText("refresh-button.label")
           </a>
         </div>
@@ -32,7 +32,7 @@
         </p>
       </div>
       <div id="api-demo-container">
-        <form id="api-demo-form" class="aui" method="POST" action="$requestContext.baseUrl/secure/apiDemoWebworkAction.jspa">
+        <form id="api-demo-form" class="aui" method="POST" action="$requestContext.baseUrl/secure/JiraNotificationsApiDemo.jspa">
           <h4 class="content-header" >$i18n.getText("notification-sending.header")</h4>
           <div class="field-group">
             <label for="notification-groups">$i18n.getText("notification-groups.label")</label>

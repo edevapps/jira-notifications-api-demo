@@ -34,11 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Named
-public class ApiDemoWebworkAction extends JiraWebActionSupport {
+public class NotificationsApiDemoWebworkAction extends JiraWebActionSupport {
 
   private static final long serialVersionUID = 199458478654094725L;
-  private static final Logger log = LoggerFactory.getLogger(ApiDemoWebworkAction.class);
-  private static final String DEFAULT_HOME_PAGE_URL = "/secure/apiDemoWebworkAction!default.jspa";
+  private static final Logger log = LoggerFactory.getLogger(NotificationsApiDemoWebworkAction.class);
+  private static final String DEFAULT_HOME_PAGE_URL = "/secure/JiraNotificationsApiDemo!default.jspa";
   private static final String NOTIFICATION_GROUPS_PAR = "notificationGroupsValue";
   private static final String NOTIFICATION_NAME_PAR = "notificationName";
   private static final String NOTIFICATION_MESSAGE_PAR = "notificationMessage";
@@ -55,7 +55,7 @@ public class ApiDemoWebworkAction extends JiraWebActionSupport {
   private final I18nResolver i18nResolver;
 
   @Inject
-  public ApiDemoWebworkAction(
+  public NotificationsApiDemoWebworkAction(
       @ComponentImport NotificationsService notificationsService,
       @ComponentImport I18nResolver i18nResolver) {
     this.notificationsService = notificationsService;

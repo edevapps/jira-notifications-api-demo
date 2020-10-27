@@ -11,7 +11,7 @@
   </parent>
   <artifactId>jira-notifications-api-demo</artifactId>
   <groupId>com.edevapps.jira.applications</groupId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
 
   <organization>
     <name>eDevApps</name>
@@ -137,9 +137,6 @@
           -->
           <!-- See here for an explanation of default instructions: -->
           <!-- https://developer.atlassian.com/docs/advanced-topics/pluginConfiguration-of-instructions-in-atlassian-plugins -->
-          <systemProperties>
-            <atlassian.dev.mode>true</atlassian.dev.mode>
-          </systemProperties>
           <skipITs>true</skipITs>
           <pluginDependencies>
             <pluginDependency>

@@ -35,31 +35,62 @@
         <form id="api-demo-form" class="aui" method="POST" action="$requestContext.baseUrl/secure/JiraNotificationsApiDemo.jspa">
           <h4 class="content-header" >$i18n.getText("notification-sending.header")</h4>
           <div class="field-group">
-            <label for="notification-groups">$i18n.getText("notification-groups.label")</label>
-            <select id="notification-groups" name="notificationGroups" class="select" multiple>
-              #foreach ($selectItem in $notificationGroups)
-                <option value = "$selectItem.value" #if($selectItem.selected == true) selected  #end >$selectItem.name</option>
-              #end
-            </select>
-          </div>
-          <div class="field-group">
             <label for="notificationName">$i18n.getText("notification-name.label")</label>
             <input id="notificationName" name="notificationName" class="text" type="text"
               value="$!notificationName"/>
           </div>
           <div class="field-group">
-            <label for="notificationMessage">$i18n.getText("notification-message.label")</label>
-            <textarea id="notificationMessage" name="notificationMessage" class="textarea" rows="6" cols="10"
-              placeholder="$i18n.getText("notification-message.description")">$!notificationMessage</textarea>
+           <label for="notificationMessage">$i18n.getText("notification-message.label")</label>
+           <textarea id="notificationMessage" name="notificationMessage" class="textarea" rows="6" cols="10"
+             placeholder="$i18n.getText("notification-message.description")">$!notificationMessage</textarea>
+          </div>
+          <div class="field-group">
+            <label for="notification-user">$i18n.getText("user.label")</label>
+            <input id="notification-user" name="notificationUser" class="text "medium-field" >
           </div>
           <div class="buttons-container">
             <div class="buttons">
-              <button id="notification-send-button" class="aui-button aui-button-primary">
+              <button id="notification-user-send-button" class="aui-button aui-button-primary">
                 $i18n.getText("send-button.label")
               </button>
             </div>
           </div>
-          <input type="hidden" id="notification-groups-value" name="notificationGroupsValue" >
+          <div class="field-group">
+            <label for="notification-user-group">$i18n.getText("notification-user-group.label")</label>
+            <select id="notification-user-group" name="notificationUserGroup" class="select">
+              <option value = "" selected></option>
+              #foreach ($selectItem in $notificationUserGroups)
+                <option value = "$selectItem.value" #if($selectItem.selected == true) selected  #end >$selectItem.name</option>
+              #end
+            </select>
+          </div>
+            <div class="buttons-container">
+              <div class="buttons">
+                <button id="notification-user-group-send-button" class="aui-button aui-button-primary">
+                  $i18n.getText("send-button.label")
+                </button>
+              </div>
+            </div>
+          <div class="field-group">
+            <label for="notification-group">$i18n.getText("notification-group.label")</label>
+            <select id="notification-group" name="notificationGroup" class="select">
+              <option value = "" selected></option>
+              #foreach ($selectItem in $notificationGroups)
+                <option value = "$selectItem.value" #if($selectItem.selected == true) selected  #end >$selectItem.name</option>
+              #end
+            </select>
+          </div>
+          <div class="buttons-container">
+            <div class="buttons">
+              <button id="notification-groups-send-button" class="aui-button aui-button-primary">
+                $i18n.getText("send-button.label")
+              </button>
+            </div>
+          </div>
+          <input type="hidden" id="action" name="action" >
+          <input type="hidden" id="notification-user-value" name="notificationUserValue" >
+          <input type="hidden" id="notification-user-group-value" name="notificationUserGroupValue" >
+          <input type="hidden" id="notification-group-value" name="notificationGroupValue" >
         </form>
       </div>
 

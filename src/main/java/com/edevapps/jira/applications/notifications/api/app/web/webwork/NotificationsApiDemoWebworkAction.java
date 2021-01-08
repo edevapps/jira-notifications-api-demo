@@ -16,17 +16,21 @@
 
 package com.edevapps.jira.applications.notifications.api.app.web.webwork;
 
+import com.atlassian.crowd.embedded.api.Group;
+import com.atlassian.jira.bc.group.search.GroupPickerSearchService;
+import com.atlassian.jira.bc.user.search.UserSearchParams;
+import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.edevapps.jira.applications.notifications.api.Notification;
 import com.edevapps.jira.applications.notifications.api.NotificationsService;
 import com.edevapps.jira.applications.notifications.api.app.web.dto.SelectItemDto;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,10 +40,21 @@ import org.slf4j.LoggerFactory;
 @Named
 public class NotificationsApiDemoWebworkAction extends JiraWebActionSupport {
 
+  public static final String ACTION_PAR = "action";
+
+  enum AppAction {
+    NOTIFICATION_GROUP_SEND,
+    NOTIFICATION_USER_SEND,
+    NOTIFICATION_USER_GROUP_SEND,
+  }
+
   private static final long serialVersionUID = 199458478654094725L;
-  private static final Logger log = LoggerFactory.getLogger(NotificationsApiDemoWebworkAction.class);
+  private static final Logger log = LoggerFactory
+      .getLogger(NotificationsApiDemoWebworkAction.class);
   private static final String DEFAULT_HOME_PAGE_URL = "/secure/JiraNotificationsApiDemo!default.jspa";
-  private static final String NOTIFICATION_GROUPS_PAR = "notificationGroupsValue";
+  private static final String NOTIFICATION_GROUP_PAR = "notificationGroupValue";
+  private static final String NOTIFICATION_USER_PAR = "notificationUserValue";
+  private static final String NOTIFICATION_USER_GROUP_PAR = "notificationUserGroupValue";
   private static final String NOTIFICATION_NAME_PAR = "notificationName";
   private static final String NOTIFICATION_MESSAGE_PAR = "notificationMessage";
   private static final String DELIMITER = ",";
@@ -49,6 +64,10 @@ public class NotificationsApiDemoWebworkAction extends JiraWebActionSupport {
   private String notificationName;
   private String notificationMessage;
   private List<SelectItemDto> notificationGroups;
+  private List<SelectItemDto> notificationUserGroups;
+  private ApplicationUser notificationUser;
+  private String notificationUserGroup;
+  private String notificationGroup;
   private String error;
   private String message;
   private final NotificationsService notificationsService;
@@ -74,6 +93,10 @@ public class NotificationsApiDemoWebworkAction extends JiraWebActionSupport {
     return this.notificationGroups;
   }
 
+  public List<SelectItemDto> getNotificationUserGroups() {
+    return notificationUserGroups;
+  }
+
   public String getMessage() {
     return this.message;
   }
@@ -95,15 +118,21 @@ public class NotificationsApiDemoWebworkAction extends JiraWebActionSupport {
   protected String doExecute() {
     try {
       loadContent();
-      if (!isEmpty(this.notificationMessage)) {
-        for (String group : getValues(getRequestParameter(NOTIFICATION_GROUPS_PAR))) {
-          this.notificationsService.sendToNotificationGroup(group,
-              new Notification(requireNonNullOrEmpty(this.notificationName, NOTIFICATION_NAME_PAR),
-                  this.notificationMessage));
+      AppAction action = getAction();
+      if (action != null && !isEmpty(this.notificationMessage)) {
+        if (AppAction.NOTIFICATION_GROUP_SEND.equals(action) && !isEmpty(this.notificationGroup)) {
+          this.notificationsService
+              .sendToNotificationGroup(this.notificationGroup, getNewNotification());
+        } else if (AppAction.NOTIFICATION_USER_SEND.equals(action)
+            && this.notificationUser != null) {
+          this.notificationsService.sendToUser(this.notificationUser, getNewNotification());
+        } else if (AppAction.NOTIFICATION_USER_GROUP_SEND.equals(action) && !isEmpty(
+            this.notificationUserGroup)) {
+          this.notificationsService
+              .sendToUserGroup(this.notificationUserGroup, getNewNotification());
         }
         return returnCompleteWithInlineRedirect(DEFAULT_HOME_PAGE_URL);
       }
-
       this.message = this.i18nResolver.getText(MESSAGE_VALUE_NOT_EMPTY_RES);
     } catch (Exception ex) {
       this.error = ex.getMessage();
@@ -112,19 +141,28 @@ public class NotificationsApiDemoWebworkAction extends JiraWebActionSupport {
     return SUCCESS;
   }
 
-  private void loadContent() {
-    Set<String> selectedGroups = new HashSet<>();
-    String notificationGroupsValue = tryGetRequestParameter(NOTIFICATION_GROUPS_PAR);
-    if (notificationGroupsValue != null) {
-      selectedGroups.addAll(getValues(notificationGroupsValue));
-    }
+  private Notification getNewNotification() {
+    return new Notification(requireNonNullOrEmpty(this.notificationName, NOTIFICATION_NAME_PAR),
+        this.notificationMessage);
+  }
 
-    this.notificationGroups = this.notificationsService.getNotificationGroupNames().stream()
-        .map(groupName ->
-            new SelectItemDto(groupName, groupName, selectedGroups.contains(groupName)))
-        .collect(Collectors.toList());
+  private void loadContent() {
+    String notificationGroupsValue = tryGetRequestParameter(NOTIFICATION_GROUP_PAR);
+
     this.notificationName = tryGetRequestParameter(NOTIFICATION_NAME_PAR);
     this.notificationMessage = tryGetRequestParameter(NOTIFICATION_MESSAGE_PAR);
+    this.notificationGroup = tryGetRequestParameter(NOTIFICATION_GROUP_PAR);
+    this.notificationGroups = this.notificationsService.getNotificationGroupNames().stream()
+        .map(groupName -> new SelectItemDto(groupName, groupName, false))
+        .collect(Collectors.toList());
+    String notificationUser = tryGetRequestParameter(NOTIFICATION_USER_PAR);
+    if (!isEmpty(notificationUser)) {
+      this.notificationUser = findUser(notificationUser);
+    }
+    this.notificationUserGroup = tryGetRequestParameter(NOTIFICATION_USER_GROUP_PAR);
+    this.notificationUserGroups = findAllGroups().stream()
+        .map(group -> new SelectItemDto(group.getName(), group.getName(), false))
+        .collect(Collectors.toList());
   }
 
   private String getRequestParameter(String name) {
@@ -155,7 +193,30 @@ public class NotificationsApiDemoWebworkAction extends JiraWebActionSupport {
     }
   }
 
+  private AppAction getAction() {
+    String antion = tryGetRequestParameter(ACTION_PAR);
+    if (isEmpty(antion)) {
+      return null;
+    }
+    return AppAction.valueOf(antion);
+  }
+
   private boolean isEmpty(String value) {
     return value == null || value.equals(EMPTY_STRING);
+  }
+
+  public static ApplicationUser findUser(String value) {
+    return findUsers(value).stream().findFirst().orElse(null);
+  }
+
+  public static List<ApplicationUser> findUsers(String value) {
+    return Collections.unmodifiableList(new ArrayList<>(ComponentAccessor.getUserSearchService()
+        .findUsers(value, new UserSearchParams(false, true, false))));
+  }
+
+  public static List<Group> findAllGroups() {
+    return Collections
+        .unmodifiableList(new ArrayList<>(
+            ComponentAccessor.getComponent(GroupPickerSearchService.class).findGroups("")));
   }
 }

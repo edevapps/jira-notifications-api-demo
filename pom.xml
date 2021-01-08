@@ -7,11 +7,11 @@
   <parent>
     <groupId>com.edevapps.jira</groupId>
     <artifactId>smart-notifications</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.5</version>
   </parent>
   <artifactId>jira-notifications-api-demo</artifactId>
   <groupId>com.edevapps.jira.applications</groupId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 
   <organization>
     <name>eDevApps</name>
